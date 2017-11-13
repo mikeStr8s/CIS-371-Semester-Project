@@ -3,8 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Movie Review Database</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <link rel="manifest" href="/manifest.json">
+    <!--Styling-->
+    <link rel="stylesheet" href="main.css">
+    <!--Polymer Components-->
+    <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="../iron-icons/iron-icons.html">
+    <link rel="import" href="/src/movie-element/movie-element.html">
+    <link rel="import" href="/bower_components/app-layout/app-layout.html">
+    <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 </head>
 <body>
-
+    <app-header reveals>
+        <app-toolbar>
+            <div main-title>Movie Reviews</div>
+            <paper-icon-button icon="search"></paper-icon-button>
+        </app-toolbar>
+    </app-header>
+    <movie-element></movie-element>
 </body>
 </html>

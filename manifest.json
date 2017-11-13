@@ -1,0 +1,7 @@
+{
+  "name": "SemesterProject",
+  "short_name": "SemesterProject",
+  "description": "Movie Rating System for CIS 371 semester project.",
+  "start_url": "/",
+  "display": "standalone"
+}
