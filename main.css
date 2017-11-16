@@ -1,9 +1,0 @@
-app-toolbar{
-    background-color: #4285f4;
-    color: white;
-    font-weight: bold;
-}
-#searchBar{
-    --paper-input-container-color: white;
-    --paper-input-container-focus-color: white;
-}
