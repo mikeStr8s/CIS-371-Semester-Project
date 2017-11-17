@@ -1,54 +1,90 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="/src/movie-element/movie-element.html">
 <link rel="import" href="/bower_components/app-layout/app-layout.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/iron-list/iron-list.html">
+<link rel="import" href="/bower_components/iron-icon/iron-icon.html">
 
 <dom-module id="movie-element">
-  <template>
-    <style>
-        app-toolbar{
-            background-color: #4285f4;
-            color: white;
-            font-weight: bold;
-        }
-        #searchBar{
-            --paper-input-container-color: white;
-            --paper-input-container-focus-color: white;
-        }
-      :host {
-        display: block;
-      }
-    </style>
-      <app-header reveals>
-          <app-toolbar>
-              <div main-title>Movie Reviews</div>
-              <paper-input id="searchBar" label="Search"></paper-input>
-              <paper-icon-button icon="search"></paper-icon-button>
-          </app-toolbar>
-      </app-header>
-    <h2>Hello [[prop1]]!</h2>
-  </template>
+    <template>
+        <style>
+            app-toolbar {
+                background-color: #4285f4;
+                color: white;
+                font-weight: bold;
+            }
 
-  <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class MovieElement extends Polymer.Element {
-      static get is() { return 'movie-element'; }
-      static get properties() {
-        return {
-          prop1: {
-            type: String,
-            value: 'movie-element'
-          }
-        };
-      }
-    }
+            #searchBar {
+                --paper-input-container-color: white;
+                --paper-input-container-focus-color: white;
+            }
+            #paperholder{
+                padding: 10px;
+            }
+            :host {
+                display: block;
+            }
+        </style>
+        <app-header reveals>
+            <app-toolbar>
+                <div main-title>Movie Reviews</div>
+                <paper-input id="searchBar" label="Search"></paper-input>
+                <paper-icon-button on-click="queryMovie" icon="search"></paper-icon-button>
+            </app-toolbar>
+        </app-header>
 
-    window.customElements.define(MovieElement.is, MovieElement);
-  </script>
+        <iron-list id="movieList" as="results">
+            <template>
+                <div id="paperholder">
+                    <paper-card elevation="2">
+                        <div class="card-content layout horizontal">
+                            <h1>[[results.title]]</h1>
+                        </div>
+                    </paper-card>
+                </div>
+            </template>
+        </iron-list>
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class MovieElement extends Polymer.Element {
+            static get is() {
+                return 'movie-element';
+            }
+
+            static get properties() {
+                return {
+                    prop1: {
+                        type: String,
+                        value: 'movie-element'
+                    },
+                };
+            }
+
+            queryMovie() {
+                var ironlist = this.$.movieList;
+                var queryURL = "https://api.themoviedb.org/3/search/movie?api_key=621dd8327c6b6da21938d21e41f1f9da&query=" + this.$.searchBar.value;
+                var resArray = [];
+                $.getJSON(queryURL, function (data, status, xhr) {
+                    JSON.stringify(data);
+                    for(var i = 0; i < data.results.length; i++){
+                        resArray.push(data.results[i]);
+                    }
+                    console.log(data);
+                    ironlist.items = resArray;
+                }).fail(function () {
+                    console.log("no movies");
+                })
+            }
+        }
+
+        window.customElements.define(MovieElement.is, MovieElement);
+    </script>
 </dom-module>
