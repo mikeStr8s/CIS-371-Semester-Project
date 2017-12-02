@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="/src/movie-element/movie-element.html">
 <link rel="import" href="/bower_components/app-layout/app-layout.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
@@ -11,53 +10,26 @@
 
 <dom-module id="movie-element">
     <template>
-        <style include="iron-flex iron-flex-alignment"></style>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style>
-            app-toolbar {
-                background-color: #4285f4;
-                color: white;
-                font-weight: bold;
+            :host{
             }
-            #movieList{
-                height: 90vh;
-                width: 100vw;
-            }
-            #searchBar {
-                --paper-input-container-color: white;
-                --paper-input-container-focus-color: white;
-            }
-            #paperholder{
-                padding: 10px;
-            }
-            :host {
-                display: block;
+            paper-card{
+                width:100%;
+                margin: 10px;
             }
         </style>
-        <app-header reveals>
-            <app-toolbar>
-                <div main-title>Movie Reviews</div>
-                <paper-input id="searchBar" label="Search"></paper-input>
-                <paper-icon-button on-click="queryMovie" icon="search"></paper-icon-button>
-            </app-toolbar>
-        </app-header>
-
-        <iron-list id="movieList" as="results">
-            <template>
-                <div id="paperholder">
-                    <paper-card elevation="2">
-                        <div class="card-content layout horizontal">
-                            <div class="flex">
-                                <h1>[[results.title]]</h1>
-                            </div>
-                            <div class="flex layout vertical">
-                                <p>Release Date: [[results.release_date]]</p>
-                                <!-- <img  id="posterImg" src="[[results.poster_path]]"> Couldnt get the image to render correctly-->
-                            </div>
-                        </div>
-                    </paper-card>
+        <paper-card elevation="2">
+            <div class="card-content layout horizontal">
+                <img id="posterImg" src="[[movie.poster_path]]">
+                <div class="flex">
+                    <h1>[[movie.title]]</h1>
                 </div>
-            </template>
-        </iron-list>
+                <div class="flex layout vertical">
+                    <p>Release Date: [[movie.release_date]]</p>
+                </div>
+            </div>
+        </paper-card>
     </template>
 
     <script>
@@ -72,30 +44,10 @@
 
             static get properties() {
                 return {
-                    prop1: {
-                        type: String,
-                        value: 'movie-element'
-                    },
-                };
-            }
-
-            queryMovie() {
-                var ironlist = this.$.movieList;
-                var queryURL = "https://api.themoviedb.org/3/search/movie?api_key=621dd8327c6b6da21938d21e41f1f9da&query=" + this.$.searchBar.value;
-                var resArray = [];
-                $.getJSON(queryURL, function (data, status, xhr) {
-                    JSON.stringify(data);
-                    for(var i = 0; i < data.results.length; i++){
-                        resArray.push(data.results[i]);
-                        var posterPath = resArray[i].poster_path;
-                        resArray[i].poster_path = 'http://image.tmdb.org/t/p/w185/'+posterPath;
-                        console.log(resArray[1]);
+                    movie:{
+                        type: Object
                     }
-                    console.log(data);
-                    ironlist.items = resArray;
-                }).fail(function () {
-                    console.log("no movies");
-                })
+                };
             }
         }
 
