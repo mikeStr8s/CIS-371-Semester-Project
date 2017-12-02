@@ -25,6 +25,7 @@
             }
             :host {
                 display: block;
+                --app-drawer-width: 40%;
             }
         </style>
         <app-header reveals effects="waterfall">
@@ -39,11 +40,14 @@
                 <!--for some reason we have to use dom-repeat with observe property to re-render
                 changes to the movie list array, OR we can just update it to a new array each time we make a change -->
                 <template is="dom-repeat" items="{{movieList}}" observe="movieList.*">
-                    <movie-element class="flex" movie="{{item}}"></movie-element>
+                    <movie-element class="flex" movie="{{item}}" on-click="openDetails"></movie-element>
                 </template>
             </div>
             <div class="flex-2">
                 <!--Side panel-->
+                <app-drawer id="sidePanel" align="right">
+
+                </app-drawer>
             </div>
         </div>
     </template>
@@ -64,6 +68,13 @@
                         value:[]
                     }
                 };
+            }
+            openDetails(event){
+                if(event && event.model && event.model.item){
+                    var movie = event.model.item;
+                    //TODO populate side panel with movie details/user review data
+                    this.$.sidePanel.open();
+                }
             }
             queryMovie() {
                 //Clear existing array to populate with new movies
