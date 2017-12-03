@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../movie-element/movie-element.html">
 
 <dom-module id="main-element">
@@ -46,13 +47,17 @@
                       database-url="https://moviedatabase-f5f54.firebaseio.com"
                       api-key="AIzaSyCFPyInIWk_oKzp50ofc-h4aakBPzIsfq8"></firebase-app>
         <firebase-auth id="auth" user="{{user}}" provider="google"></firebase-auth>
-
+        <firebase-document
+                path="/users/[[user.uid]]"
+                data="{{userData}}">
+        </firebase-document>
         <app-header reveals effects="waterfall">
             <app-toolbar>
                 <div main-title>Movie Reviews</div>
                 <paper-input id="searchBar" label="Search"></paper-input>
                 <paper-icon-button on-click="queryMovie" icon="search"></paper-icon-button>
                 <template is="dom-if" if="[[user]]">
+                    <paper-button>[[user.displayName]]</paper-button>
                     <paper-button on-click="logout">Logout</paper-button>
                 </template>
                 <template is="dom-if" if="[[!user]]">
@@ -71,8 +76,15 @@
             <div class="flex-2">
                 <!--Side panel-->
                 <app-drawer id="sidePanel" align="right">
-                    <p id="overview"></p>
-                    <p id="moviegenres"></p>
+                    <div class="vertical layout start">
+                        <p id="overview"></p>
+                        <p id="moviegenres"></p>
+                        <p>Your Rating:</p>
+                        <div class="horizontal layout self-center">
+                            <paper-slider min="0" max="10" value="{{sliderValue}}" snaps></paper-slider>
+                            <div id="rating">[[sliderValue]]</div>
+                        </div>
+                    </div>
                 </app-drawer>
             </div>
         </div>
@@ -95,6 +107,18 @@
                     },
                     user:{
                         type:Object
+                    },
+                    userData:{
+                        type: Object
+                        //TODO needs to be initialized to 'new UserData' if user doesn't have data
+                    },
+                    sliderValue:{
+                        type: Number,
+                        value: 5,
+                        observer:'sliderChanged'
+                    },
+                    selectedMovie:{
+                        type: Object
                     }
                 };
             }
@@ -103,7 +127,7 @@
                 this.$.auth.signInWithPopup()
                     .then(function(response){
                         console.log(response);
-                    })
+                    }.bind(this))
                     .catch(function(error){
                         console.log("Error signing in");
                         console.log(error);
@@ -116,6 +140,7 @@
             openDetails(event){
                 if(event && event.model && event.model.item){
                     var movie = event.model.item;
+                    this.set('selectedMovie', movie);
                     //TODO populate side panel with movie details/user review data
 
                     var moviegenres = this.$.moviegenres;   //variable for the movie genre element
@@ -156,6 +181,9 @@
                 }.bind(this)).fail(function () {
                     console.log("no movies");
                 })
+            }
+            sliderChanged(newVal){
+                //TODO setup binding to 'userData'
             }
         }
 
