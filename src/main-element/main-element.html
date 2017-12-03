@@ -8,9 +8,19 @@
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../movie-element/movie-element.html">
 
 <dom-module id="main-element">
+    <!--FIREBASE DATA:
+    apiKey: "AIzaSyCFPyInIWk_oKzp50ofc-h4aakBPzIsfq8",
+    authDomain: "moviedatabase-f5f54.firebaseapp.com",
+    databaseURL: "https://moviedatabase-f5f54.firebaseio.com",
+    projectId: "moviedatabase-f5f54",
+    storageBucket: "moviedatabase-f5f54.appspot.com",
+    messagingSenderId: "924071065259"
+    -->
+
     <template>
         <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style>
@@ -28,11 +38,22 @@
                 --app-drawer-width: 40%;
             }
         </style>
+        <firebase-app auth-domain="moviedatabase-f5f54.firebaseapp.com"
+                      database-url="https://moviedatabase-f5f54.firebaseio.com"
+                      api-key="AIzaSyCFPyInIWk_oKzp50ofc-h4aakBPzIsfq8"></firebase-app>
+        <firebase-auth id="auth" user="{{user}}" provider="google"></firebase-auth>
+
         <app-header reveals effects="waterfall">
             <app-toolbar>
                 <div main-title>Movie Reviews</div>
                 <paper-input id="searchBar" label="Search"></paper-input>
                 <paper-icon-button on-click="queryMovie" icon="search"></paper-icon-button>
+                <template is="dom-if" if="[[user]]">
+                    <paper-button on-click="logout">Logout</paper-button>
+                </template>
+                <template is="dom-if" if="[[!user]]">
+                    <paper-button on-click="login">Login</paper-button>
+                </template>
             </app-toolbar>
         </app-header>
         <div class="layout horizontal">
@@ -66,8 +87,26 @@
                     movieList:{
                         type: Array,
                         value:[]
+                    },
+                    user:{
+                        type:Object
                     }
                 };
+            }
+            login(){
+                console.log("Logging in");
+                this.$.auth.signInWithPopup()
+                    .then(function(response){
+                        console.log(response);
+                    })
+                    .catch(function(error){
+                        console.log("Error signing in");
+                        console.log(error);
+                    });
+            }
+            logout(){
+                console.log("Logging out");
+                this.$.auth.signOut();
             }
             openDetails(event){
                 if(event && event.model && event.model.item){
