@@ -46,7 +46,7 @@
             <div class="flex-2">
                 <!--Side panel-->
                 <app-drawer id="sidePanel" align="right">
-
+                    <p id="overview"></p>
                 </app-drawer>
             </div>
         </div>
@@ -73,7 +73,27 @@
                 if(event && event.model && event.model.item){
                     var movie = event.model.item;
                     //TODO populate side panel with movie details/user review data
+                    console.log(movie);
+
+                    var genreURL = "https://api.themoviedb.org/3/genre/movie/list?api_key=621dd8327c6b6da21938d21e41f1f9da&language=en-US";
+                    $.getJSON(genreURL, function (data, status, xhr) {
+                        JSON.stringify(data);
+                        var genreArray = data['genres'];    //store array of genres and their corresponding id's
+                        var movieGenres = [];    //array for storing all of the genre names for a given movie
+                        for(var i = 0; i < movie['genre_ids'].length; i++){ //for each genre id tied to a movie
+                            for(var k = 0; k < genreArray.length; k++){ //for each entry in the genre array
+                                if(movie['genre_ids'][i] === genreArray[k]['id']){  //if the movies genre id is the same as one in the genre array
+                                    movieGenres.push(genreArray[k]['name']);    //add genre to movie genre array
+                                }
+                            }
+                        }
+                        console.log(movieGenres);
+                    });
+
+                    var movieOverview = movie['overview'];  //string element for a movies given overview text
+
                     this.$.sidePanel.open();
+
                 }
             }
             queryMovie() {
