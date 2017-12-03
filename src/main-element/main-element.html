@@ -37,6 +37,10 @@
                 display: block;
                 --app-drawer-width: 40%;
             }
+            #sidePanel p{
+                padding:10px;
+                text-align: left;
+            }
         </style>
         <firebase-app auth-domain="moviedatabase-f5f54.firebaseapp.com"
                       database-url="https://moviedatabase-f5f54.firebaseio.com"
@@ -68,6 +72,7 @@
                 <!--Side panel-->
                 <app-drawer id="sidePanel" align="right">
                     <p id="overview"></p>
+                    <p id="moviegenres"></p>
                 </app-drawer>
             </div>
         </div>
@@ -112,7 +117,9 @@
                 if(event && event.model && event.model.item){
                     var movie = event.model.item;
                     //TODO populate side panel with movie details/user review data
-                    console.log(movie);
+
+                    var moviegenres = this.$.moviegenres;   //variable for the movie genre element
+                    moviegenres.textContent = "";   //clear the text within the element
 
                     var genreURL = "https://api.themoviedb.org/3/genre/movie/list?api_key=621dd8327c6b6da21938d21e41f1f9da&language=en-US";
                     $.getJSON(genreURL, function (data, status, xhr) {
@@ -123,16 +130,16 @@
                             for(var k = 0; k < genreArray.length; k++){ //for each entry in the genre array
                                 if(movie['genre_ids'][i] === genreArray[k]['id']){  //if the movies genre id is the same as one in the genre array
                                     movieGenres.push(genreArray[k]['name']);    //add genre to movie genre array
+                                    moviegenres.textContent+= genreArray[k]['name']+ " ";   //set component text to include the genre
                                 }
                             }
                         }
-                        console.log(movieGenres);
                     });
 
                     var movieOverview = movie['overview'];  //string element for a movies given overview text
+                    this.$.overview.textContent = movieOverview;    //set component text to the movie overview
 
                     this.$.sidePanel.open();
-
                 }
             }
             queryMovie() {
