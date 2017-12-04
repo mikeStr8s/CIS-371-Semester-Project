@@ -109,8 +109,8 @@
                         type:Object
                     },
                     userData:{
-                        type: Object
-                        //TODO needs to be initialized to 'new UserData' if user doesn't have data
+                        type: Object,
+                        observer: 'observeUserData'
                     },
                     sliderValue:{
                         type: Number,
@@ -183,7 +183,23 @@
                 })
             }
             sliderChanged(newVal){
-                //TODO setup binding to 'userData'
+                if(this.userData.movieReviews){
+                    var movieReview = this.userData.movieReviews[this.selectedMovie.id];
+                    if(movieReview){
+                        //Update existing rating
+                        this.set(`userData.movieReviews.${this.selectedMovie.id}.rating`, newVal);
+                    }else{
+                        //Set new rating
+                        this.set(`userData.movieReviews.${this.selectedMovie.id}`, {rating: newVal});
+                    }
+                }
+            }
+            observeUserData(newVal){
+                if(Object.keys(newVal) <= 0){
+                    //Initialize user data if empty object
+                    this.set('userData',new UserData());
+                }
+                console.log(newVal);
             }
         }
 
