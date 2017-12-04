@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../movie-review/movie-review.html">
 <link rel="import" href="../movie-element/movie-element.html">
 
 <dom-module id="main-element">
@@ -49,6 +50,10 @@
                 padding:10px;
                 text-align: left;
             }
+            #movieReviewDisplay{
+                overflow: auto;
+                height: 95vh;
+            }
         </style>
         <!---FIREBASE STUFF---->
         <firebase-app auth-domain="moviedatabase-f5f54.firebaseapp.com"
@@ -85,17 +90,22 @@
             <div class="flex-2">
                 <!--Side panel-->
                 <app-drawer id="sidePanel" align="right">
-                    <div class="vertical layout start">
+                    <div class="vertical layout">
                         <p id="overview"></p>
                         <p id="moviegenres"></p>
                         <div id="movieReviewInput">
                             <p>Your Rating:</p>
-                            <div class="horizontal layout self-center">
+                            <div class="horizontal layout center-justified">
                                 <paper-slider min="0" max="10" value="{{sliderValue}}" snaps></paper-slider>
-                                <div id="rating">[[sliderValue]]</div>
+                                <div id="rating" class="self-center">[[sliderValue]]</div>
                             </div>
-                            <paper-input id="movieComment"></paper-input>
+                            <paper-input id="movieComment" label="Comment"></paper-input>
                             <paper-button id="movieReviewSubmit" on-click="submitMovieReview">Submit</paper-button>
+                        </div>
+                        <div id="movieReviewDisplay">
+                            <template is="dom-repeat" items="{{currentMovieReviews}}">
+                                <movie-review user="[[user]]" review="{{item}}"></movie-review>
+                            </template>
                         </div>
                     </div>
                 </app-drawer>
@@ -122,14 +132,23 @@
                         type:Object
                     },
                     movieReviews:{
-                        type: Object
+                        type: Object,
+                        value:{},
+                        notify:true
+                        },
+                    currentMovieReviews:{
+                        type: Array,
+                        value:[],
+                        notify: true,
+                        computed: 'getCurrentMovieReviews(movieReviews, selectedMovie)'
                     },
                     sliderValue:{
                         type: Number,
                         value: 5
                     },
                     selectedMovie:{
-                        type: Object
+                        type: Object,
+                        value:{}
                     }
                 };
             }
@@ -195,16 +214,26 @@
             }
             submitMovieReview(){
                 var currentMovieReviews = this.movieReviews[this.selectedMovie.id];
-                if(currentMovieReviews){
+                if(currentMovieReviews) {
                     //Add to existing movie reviews
-                    this.push(`movieReviews.${this.selectedMovie.id}`, {userId: this.user.uid, userName: this.user.displayName,
-                        rating: this.sliderValue, comment: this.$.movieComment.value});
+                    this.push(`movieReviews.${this.selectedMovie.id}`, {
+                        userId: this.user.uid, userName: this.user.displayName,
+                        rating: this.sliderValue, comment: this.$.movieComment.value
+                    });
                 }else{
                     //Create new array for this movie with this review
                     this.set(`movieReviews.${this.selectedMovie.id}`, [{userId: this.user.uid, userName: this.user.displayName,
                         rating: this.sliderValue, comment: this.$.movieComment.value}]);
                 }
 
+            }
+            getCurrentMovieReviews(movieReviews, currentMovie){
+                if(currentMovie){
+                    var movieReviews = movieReviews[currentMovie.id];
+                    //Link this computed value with actual array
+                    this.linkPaths('currentMovieReviews', `movieReviews.${currentMovie.id}`);
+                    return movieReviews ? movieReviews : [];
+                }
             }
         }
 
