@@ -21,7 +21,14 @@
     storageBucket: "moviedatabase-f5f54.appspot.com",
     messagingSenderId: "924071065259"
     -->
-
+    <!-----Possible Firebase Structure
+    Root
+       |_movieReviews
+            |_movieID
+                |_Array(movieReview)[
+                    [0] movieReview -> {rating: 10, comment: "This movie changed my life", userName: "Josh Getter"}
+                ]
+    -->
     <template>
         <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style>
@@ -43,14 +50,16 @@
                 text-align: left;
             }
         </style>
+        <!---FIREBASE STUFF---->
         <firebase-app auth-domain="moviedatabase-f5f54.firebaseapp.com"
                       database-url="https://moviedatabase-f5f54.firebaseio.com"
                       api-key="AIzaSyCFPyInIWk_oKzp50ofc-h4aakBPzIsfq8"></firebase-app>
         <firebase-auth id="auth" user="{{user}}" provider="google"></firebase-auth>
         <firebase-document
-                path="/users/[[user.uid]]"
-                data="{{userData}}">
+                path="/movieReviews"
+                data="{{movieReviews}}">
         </firebase-document>
+
         <app-header reveals effects="waterfall">
             <app-toolbar>
                 <div main-title>Movie Reviews</div>
@@ -79,10 +88,14 @@
                     <div class="vertical layout start">
                         <p id="overview"></p>
                         <p id="moviegenres"></p>
-                        <p>Your Rating:</p>
-                        <div class="horizontal layout self-center">
-                            <paper-slider min="0" max="10" value="{{sliderValue}}" snaps></paper-slider>
-                            <div id="rating">[[sliderValue]]</div>
+                        <div id="movieReviewInput">
+                            <p>Your Rating:</p>
+                            <div class="horizontal layout self-center">
+                                <paper-slider min="0" max="10" value="{{sliderValue}}" snaps></paper-slider>
+                                <div id="rating">[[sliderValue]]</div>
+                            </div>
+                            <paper-input id="movieComment"></paper-input>
+                            <paper-button id="movieReviewSubmit" on-click="submitMovieReview">Submit</paper-button>
                         </div>
                     </div>
                 </app-drawer>
@@ -108,14 +121,12 @@
                     user:{
                         type:Object
                     },
-                    userData:{
-                        type: Object,
-                        observer: 'observeUserData'
+                    movieReviews:{
+                        type: Object
                     },
                     sliderValue:{
                         type: Number,
-                        value: 5,
-                        observer:'sliderChanged'
+                        value: 5
                     },
                     selectedMovie:{
                         type: Object
@@ -182,24 +193,18 @@
                     console.log("no movies");
                 })
             }
-            sliderChanged(newVal){
-                if(this.userData.movieReviews){
-                    var movieReview = this.userData.movieReviews[this.selectedMovie.id];
-                    if(movieReview){
-                        //Update existing rating
-                        this.set(`userData.movieReviews.${this.selectedMovie.id}.rating`, newVal);
-                    }else{
-                        //Set new rating
-                        this.set(`userData.movieReviews.${this.selectedMovie.id}`, {rating: newVal});
-                    }
+            submitMovieReview(){
+                var currentMovieReviews = this.movieReviews[this.selectedMovie.id];
+                if(currentMovieReviews){
+                    //Add to existing movie reviews
+                    this.push(`movieReviews.${this.selectedMovie.id}`, {userId: this.user.uid, userName: this.user.displayName,
+                        rating: this.sliderValue, comment: this.$.movieComment.value});
+                }else{
+                    //Create new array for this movie with this review
+                    this.set(`movieReviews.${this.selectedMovie.id}`, [{userId: this.user.uid, userName: this.user.displayName,
+                        rating: this.sliderValue, comment: this.$.movieComment.value}]);
                 }
-            }
-            observeUserData(newVal){
-                if(Object.keys(newVal) <= 0){
-                    //Initialize user data if empty object
-                    this.set('userData',new UserData());
-                }
-                console.log(newVal);
+
             }
         }
 
