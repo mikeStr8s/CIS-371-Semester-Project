@@ -242,27 +242,24 @@
             submitMovieReview() {
                 var currentMovieReviews = this.movieReviews[this.selectedMovie.id];
                 if (currentMovieReviews) {
-                    //Add to existing movie reviews
-                    this.push(`movieReviews.${this.selectedMovie.id}`, {
-                        userId: this.user.uid, userName: this.user.displayName,
+                    //Set movieReviews object to new object containing updated review array for current movie.
+                    this.movieReviews = {...this.movieReviews, [this.selectedMovie.id] : [...this.movieReviews[this.selectedMovie.id],
+                        {userId: this.user.uid, userName: this.user.displayName,
                         rating: this.sliderValue, comment: this.$.movieComment.value
-                    });
-                } else {
-                    //Create new array for this movie with this review
-                    this.set(`movieReviews.${this.selectedMovie.id}`, [{
-                        userId: this.user.uid, userName: this.user.displayName,
-                        rating: this.sliderValue, comment: this.$.movieComment.value
-                    }]);
+                    }]};
                 }
-
             }
 
             getCurrentMovieReviews(movieReviews, currentMovie) {
-                if (currentMovie) {
-                    var movieReviews = movieReviews[currentMovie.id];
-                    //Link this computed value with actual array
+                if (currentMovie && currentMovie.id) {
+                    var thisMovieReviews = movieReviews[currentMovie.id];
+                    if(!thisMovieReviews){
+                        //Initialize this movie's review array to new array
+                        this.set(`movieReviews.${currentMovie.id}`,[]);
+                    }
+                    //Link this property to corresponding array in movieReviews object
                     this.linkPaths('currentMovieReviews', `movieReviews.${currentMovie.id}`);
-                    return movieReviews ? movieReviews : [];
+                    return movieReviews[currentMovie.id];
                 }
             }
         }
