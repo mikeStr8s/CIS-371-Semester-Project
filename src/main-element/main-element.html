@@ -34,7 +34,7 @@
         <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style>
             app-toolbar {
-                background-color: #4285f4;
+                background-color: #0FA3B1;
                 color: white;
                 font-weight: bold;
             }
@@ -49,17 +49,24 @@
                 --app-drawer-width: 40%;
             }
 
-            #sidePanel p {
-                padding: 10px;
+            #sidePanel p, h3 {
                 text-align: left;
+            }
+
+            #sidecontainer {
+                background-color: #F9F7F3;
             }
 
             #movieReviewDisplay {
                 overflow: auto;
                 height: 95vh;
             }
-            #reviewlist{
-                height: 40vh;
+
+            #reviewlist {
+                height: 35vh;
+            }
+            #reviewholder{
+                padding: 5px;
             }
         </style>
         <!---FIREBASE STUFF---->
@@ -97,8 +104,10 @@
             <div class="flex-2">
                 <!--Side panel-->
                 <app-drawer id="sidePanel" align="right">
-                    <div class="vertical layout">
+                    <div id="sidecontainer" class="vertical layout">
+                        <h3>Overview:</h3>
                         <p id="overview"></p>
+                        <h3>Genres</h3>
                         <p id="moviegenres"></p>
                         <div id="movieReviewInput">
                             <p>Your Rating:</p>
@@ -112,7 +121,9 @@
                         <div id="movieReviewDisplay">
                             <iron-list id="reviewlist" items="{{currentMovieReviews}}">
                                 <template>
-                                    <movie-review user="[[user]]" review="{{item}}"></movie-review>
+                                    <div id="reviewholder">
+                                        <movie-review user="[[user]]" review="{{item}}"></movie-review>
+                                    </div>
                                 </template>
                             </iron-list>
                         </div>
