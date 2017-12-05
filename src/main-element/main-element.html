@@ -195,7 +195,8 @@
                 if (event && event.model && event.model.item) {
                     var movie = event.model.item;
                     this.set('selectedMovie', movie);
-                    //TODO populate side panel with movie details/user review data
+                    this.sliderValue = 5;
+                    this.$.movieComment.value = "";
 
                     var moviegenres = this.$.moviegenres;   //variable for the movie genre element
                     moviegenres.textContent = "";   //clear the text within the element
