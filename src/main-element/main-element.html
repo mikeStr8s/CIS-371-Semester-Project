@@ -38,21 +38,28 @@
                 color: white;
                 font-weight: bold;
             }
+
             #searchBar {
                 --paper-input-container-color: white;
                 --paper-input-container-focus-color: white;
             }
+
             :host {
                 display: block;
                 --app-drawer-width: 40%;
             }
-            #sidePanel p{
-                padding:10px;
+
+            #sidePanel p {
+                padding: 10px;
                 text-align: left;
             }
-            #movieReviewDisplay{
+
+            #movieReviewDisplay {
                 overflow: auto;
                 height: 95vh;
+            }
+            #reviewlist{
+                height: 40vh;
             }
         </style>
         <!---FIREBASE STUFF---->
@@ -103,9 +110,11 @@
                             <paper-button id="movieReviewSubmit" on-click="submitMovieReview">Submit</paper-button>
                         </div>
                         <div id="movieReviewDisplay">
-                            <template is="dom-repeat" items="{{currentMovieReviews}}">
-                                <movie-review user="[[user]]" review="{{item}}"></movie-review>
-                            </template>
+                            <iron-list id="reviewlist" items="{{currentMovieReviews}}">
+                                <template>
+                                    <movie-review user="[[user]]" review="{{item}}"></movie-review>
+                                </template>
+                            </iron-list>
                         </div>
                     </div>
                 </app-drawer>
@@ -122,53 +131,57 @@
             static get is() {
                 return 'main-element';
             }
+
             static get properties() {
                 return {
-                    movieList:{
+                    movieList: {
                         type: Array,
-                        value:[]
+                        value: []
                     },
-                    user:{
-                        type:Object
+                    user: {
+                        type: Object
                     },
-                    movieReviews:{
+                    movieReviews: {
                         type: Object,
-                        value:{},
-                        notify:true
-                        },
-                    currentMovieReviews:{
+                        value: {},
+                        notify: true
+                    },
+                    currentMovieReviews: {
                         type: Array,
-                        value:[],
+                        value: [],
                         notify: true,
                         computed: 'getCurrentMovieReviews(movieReviews, selectedMovie)'
                     },
-                    sliderValue:{
+                    sliderValue: {
                         type: Number,
                         value: 5
                     },
-                    selectedMovie:{
+                    selectedMovie: {
                         type: Object,
-                        value:{}
+                        value: {}
                     }
                 };
             }
-            login(){
+
+            login() {
                 console.log("Logging in");
                 this.$.auth.signInWithPopup()
-                    .then(function(response){
+                    .then(function (response) {
                         console.log(response);
                     }.bind(this))
-                    .catch(function(error){
+                    .catch(function (error) {
                         console.log("Error signing in");
                         console.log(error);
                     });
             }
-            logout(){
+
+            logout() {
                 console.log("Logging out");
                 this.$.auth.signOut();
             }
-            openDetails(event){
-                if(event && event.model && event.model.item){
+
+            openDetails(event) {
+                if (event && event.model && event.model.item) {
                     var movie = event.model.item;
                     this.set('selectedMovie', movie);
                     //TODO populate side panel with movie details/user review data
@@ -181,11 +194,11 @@
                         JSON.stringify(data);
                         var genreArray = data['genres'];    //store array of genres and their corresponding id's
                         var movieGenres = [];    //array for storing all of the genre names for a given movie
-                        for(var i = 0; i < movie['genre_ids'].length; i++){ //for each genre id tied to a movie
-                            for(var k = 0; k < genreArray.length; k++){ //for each entry in the genre array
-                                if(movie['genre_ids'][i] === genreArray[k]['id']){  //if the movies genre id is the same as one in the genre array
+                        for (var i = 0; i < movie['genre_ids'].length; i++) { //for each genre id tied to a movie
+                            for (var k = 0; k < genreArray.length; k++) { //for each entry in the genre array
+                                if (movie['genre_ids'][i] === genreArray[k]['id']) {  //if the movies genre id is the same as one in the genre array
                                     movieGenres.push(genreArray[k]['name']);    //add genre to movie genre array
-                                    moviegenres.textContent+= genreArray[k]['name']+ " ";   //set component text to include the genre
+                                    moviegenres.textContent += genreArray[k]['name'] + " ";   //set component text to include the genre
                                 }
                             }
                         }
@@ -197,38 +210,43 @@
                     this.$.sidePanel.open();
                 }
             }
+
             queryMovie() {
                 //Clear existing array to populate with new movies
                 this.set('movieList', []);
                 var queryURL = "https://api.themoviedb.org/3/search/movie?api_key=621dd8327c6b6da21938d21e41f1f9da&query=" + this.$.searchBar.value;
                 $.getJSON(queryURL, function (data, status, xhr) {
-                    for(var i = 0; i < data.results.length; i++){
+                    for (var i = 0; i < data.results.length; i++) {
                         var movie = data.results[i];
                         movie.poster_path = `http://image.tmdb.org/t/p/w92${movie.poster_path}`;
                         //We have to use Polymer push method with observable arrays :(
-                        this.push('movieList',movie);
+                        this.push('movieList', movie);
                     }
                 }.bind(this)).fail(function () {
                     console.log("no movies");
                 })
             }
-            submitMovieReview(){
+
+            submitMovieReview() {
                 var currentMovieReviews = this.movieReviews[this.selectedMovie.id];
-                if(currentMovieReviews) {
+                if (currentMovieReviews) {
                     //Add to existing movie reviews
                     this.push(`movieReviews.${this.selectedMovie.id}`, {
                         userId: this.user.uid, userName: this.user.displayName,
                         rating: this.sliderValue, comment: this.$.movieComment.value
                     });
-                }else{
+                } else {
                     //Create new array for this movie with this review
-                    this.set(`movieReviews.${this.selectedMovie.id}`, [{userId: this.user.uid, userName: this.user.displayName,
-                        rating: this.sliderValue, comment: this.$.movieComment.value}]);
+                    this.set(`movieReviews.${this.selectedMovie.id}`, [{
+                        userId: this.user.uid, userName: this.user.displayName,
+                        rating: this.sliderValue, comment: this.$.movieComment.value
+                    }]);
                 }
 
             }
-            getCurrentMovieReviews(movieReviews, currentMovie){
-                if(currentMovie){
+
+            getCurrentMovieReviews(movieReviews, currentMovie) {
+                if (currentMovie) {
                     var movieReviews = movieReviews[currentMovie.id];
                     //Link this computed value with actual array
                     this.linkPaths('currentMovieReviews', `movieReviews.${currentMovie.id}`);

@@ -19,7 +19,7 @@
                 text-align: left;
             }
         </style>
-        <div class="layout vertical">
+        <div id="reviewholder" class="layout vertical">
             <div>[[review.userName]] Wrote:</div>
             <template is="dom-if" if="[[checkReviewUser(user, review.userId)]]">
                 <paper-input type="text" value="{{review.comment}}"></paper-input>
