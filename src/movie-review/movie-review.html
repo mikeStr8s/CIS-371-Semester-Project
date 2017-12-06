@@ -6,6 +6,7 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="movie-review">
@@ -19,15 +20,25 @@
                 text-align: left;
             }
         </style>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <div id="reviewholder" class="layout vertical">
-            <div>[[review.userName]] Wrote:</div>
+            <!---Current User's review---->
             <template is="dom-if" if="[[checkReviewUser(user, review.userId)]]">
+                <div>You Wrote:</div>
                 <paper-input type="text" value="{{review.comment}}"></paper-input>
+                <div class="layout horizontal">
+                    <div>Rating:</div>
+                    <paper-slider min="0" max="10" value="{{review.rating}}" snaps></paper-slider>
+                    <div>[[review.rating]]</div>
+                </div>
             </template>
+
+            <!---Other User's review----->
             <template is="dom-if" if="[[!checkReviewUser(user, review.userId)]]">
+                <div>[[review.userName]] Wrote:</div>
                 <div>[[review.comment]]</div>
+                <div>Rating: {{review.rating}}</div>
             </template>
-            <div>Rating: {{review.rating}}</div>
         </div>
     </template>
 
@@ -48,7 +59,8 @@
                         value:{}
                     },
                     user:{
-                        type: Object
+                        type: Object,
+                        value: {}
                     }
                 };
             }
@@ -57,11 +69,6 @@
                     return user.uid == reviewUser;
                 }
             }
-            commentValueChanged(val){
-                this.set(`movieReviews.${this.selectedMovie.id}[${this.index}].comment`,val.detail.value);
-                //this.notifyPath(`movieReviews.${this.selectedMovie.id}[${this.index}]`);
-            }
-
         }
 
         window.customElements.define(MovieReview.is, MovieReview);

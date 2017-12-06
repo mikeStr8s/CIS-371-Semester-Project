@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../movie-review/movie-review.html">
 <link rel="import" href="../movie-element/movie-element.html">
 
@@ -117,6 +118,7 @@
                             </div>
                             <paper-input id="movieComment" label="Comment"></paper-input>
                             <paper-button id="movieReviewSubmit" on-click="submitMovieReview">Submit</paper-button>
+                            <paper-toast id="toast" text="Sign in to leave a review."></paper-toast>
                         </div>
                         <div id="movieReviewDisplay">
                             <iron-list id="reviewlist" items="{{currentMovieReviews}}">
@@ -150,7 +152,8 @@
                         value: []
                     },
                     user: {
-                        type: Object
+                        type: Object,
+                        value:{}
                     },
                     movieReviews: {
                         type: Object,
@@ -242,11 +245,16 @@
             submitMovieReview() {
                 var currentMovieReviews = this.movieReviews[this.selectedMovie.id];
                 if (currentMovieReviews) {
-                    //Set movieReviews object to new object containing updated review array for current movie.
-                    this.movieReviews = {...this.movieReviews, [this.selectedMovie.id] : [...this.movieReviews[this.selectedMovie.id],
-                        {userId: this.user.uid, userName: this.user.displayName,
-                        rating: this.sliderValue, comment: this.$.movieComment.value
-                    }]};
+                    if(!this.user){
+                        //If user not authenticated present toast message and dont let review publish
+                        this.$.toast.open();
+                    }else{
+                        //Set movieReviews object to new object containing updated review array for current movie.
+                        this.movieReviews = {...this.movieReviews, [this.selectedMovie.id] : [...this.movieReviews[this.selectedMovie.id],
+                            {userId: this.user.uid, userName: this.user.displayName,
+                                rating: this.sliderValue, comment: this.$.movieComment.value
+                            }]};
+                    }
                 }
             }
 
