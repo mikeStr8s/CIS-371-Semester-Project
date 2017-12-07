@@ -39,6 +39,12 @@
                 color: white;
                 font-weight: bold;
             }
+            app-toolbar paper-button{
+                margin-right: 5px;
+                padding:2px;
+                border: 1px solid white;
+                border-radius: 3px;
+            }
 
             #searchBar {
                 --paper-input-container-color: white;
@@ -52,6 +58,15 @@
 
             #sidePanel p, h3 {
                 text-align: left;
+            }
+
+            #firstopen p{
+                width:50%;
+                padding-left: 15px;
+                font-size: 150%;
+            }
+            #firstopen h1{
+                padding-left: 15px;
             }
 
             #sidecontainer {
@@ -82,7 +97,7 @@
 
         <app-header reveals effects="waterfall">
             <app-toolbar>
-                <div main-title>Movie Reviews</div>
+                <div main-title>Rate That Flick!</div>
                 <paper-input id="searchBar" label="Search"></paper-input>
                 <paper-icon-button on-click="queryMovie" icon="search"></paper-icon-button>
                 <template is="dom-if" if="[[user]]">
@@ -94,6 +109,12 @@
                 </template>
             </app-toolbar>
         </app-header>
+        <div id="firstopen">
+            <h1>Welcome!</h1>
+            <p>To use this website all you need to do is enter a movie title, or part of one, into the search bar at the top and click the search button next to it!</p>
+            <img src="../../title_and_search.png">
+            <p>If you would like to leave reviews and ratings on your favorite titles, or even your least favorite ones, just click the login button.</p>
+        </div>
         <div class="layout horizontal">
             <div class="flex-2 layout vertical">
                 <!--for some reason we have to use dom-repeat with observe property to re-render
@@ -102,7 +123,7 @@
                     <movie-element class="flex" movie="{{item}}" on-click="openDetails"></movie-element>
                 </template>
             </div>
-            <div class="flex-2">
+            <div id="sidepanelholder" class="flex-2">
                 <!--Side panel-->
                 <app-drawer id="sidePanel" align="right">
                     <div id="sidecontainer" class="vertical layout">
@@ -227,6 +248,11 @@
             }
 
             queryMovie() {
+                var element = this.$.firstopen;
+                if(element){
+                    element.parentNode.removeChild(element);
+                }
+
                 //Clear existing array to populate with new movies
                 this.set('movieList', []);
                 var queryURL = "https://api.themoviedb.org/3/search/movie?api_key=621dd8327c6b6da21938d21e41f1f9da&query=" + this.$.searchBar.value;
