@@ -31,8 +31,9 @@
                     [0] movieReview -> {rating: 10, comment: "This movie changed my life", userName: "Josh Getter"}
                 ]
     -->
-    <template>
+    <template id="entiredoc">
         <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
+
         <style>
             app-toolbar {
                 background-color: #0FA3B1;
@@ -109,12 +110,6 @@
                 </template>
             </app-toolbar>
         </app-header>
-        <div id="firstopen">
-            <h1>Welcome!</h1>
-            <p>To use this website all you need to do is enter a movie title, or part of one, into the search bar at the top and click the search button next to it!</p>
-            <img src="../../title_and_search.png">
-            <p>If you would like to leave reviews and ratings on your favorite titles, or even your least favorite ones, just click the login button.</p>
-        </div>
         <div class="layout horizontal">
             <div class="flex-2 layout vertical">
                 <!--for some reason we have to use dom-repeat with observe property to re-render
@@ -248,11 +243,6 @@
             }
 
             queryMovie() {
-                var element = this.$.firstopen;
-                if(element){
-                    element.parentNode.removeChild(element);
-                }
-
                 //Clear existing array to populate with new movies
                 this.set('movieList', []);
                 var queryURL = "https://api.themoviedb.org/3/search/movie?api_key=621dd8327c6b6da21938d21e41f1f9da&query=" + this.$.searchBar.value;
