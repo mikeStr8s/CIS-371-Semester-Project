@@ -40,9 +40,10 @@
                 color: white;
                 font-weight: bold;
             }
-            app-toolbar paper-button{
+
+            app-toolbar paper-button {
                 margin-right: 5px;
-                padding:2px;
+                padding: 2px;
                 border: 1px solid white;
                 border-radius: 3px;
             }
@@ -61,12 +62,13 @@
                 text-align: left;
             }
 
-            #firstopen p{
-                width:50%;
+            #firstopen p {
+                width: 50%;
                 padding-left: 15px;
                 font-size: 150%;
             }
-            #firstopen h1{
+
+            #firstopen h1 {
                 padding-left: 15px;
             }
 
@@ -82,7 +84,8 @@
             #reviewlist {
                 height: 35vh;
             }
-            #reviewholder{
+
+            #reviewholder {
                 padding: 5px;
             }
         </style>
@@ -118,6 +121,14 @@
                     <movie-element class="flex" movie="{{item}}" on-click="openDetails"></movie-element>
                 </template>
             </div>
+            <div id="firstopen">
+                <h1>Welcome!</h1>
+                <p>To use this website all you need to do is enter a movie title, or part of one, into the search
+                    bar at the top and click the search button next to it!</p>
+                <img src="../../title_and_search.png">
+                <p>If you would like to leave reviews and ratings on your favorite titles, or even your least
+                    favorite ones, just click the login button.</p>
+            </div>
             <div id="sidepanelholder" class="flex-2">
                 <!--Side panel-->
                 <app-drawer id="sidePanel" align="right">
@@ -147,6 +158,7 @@
                         </div>
                     </div>
                 </app-drawer>
+
             </div>
         </div>
     </template>
@@ -169,7 +181,7 @@
                     },
                     user: {
                         type: Object,
-                        value:{}
+                        value: {}
                     },
                     movieReviews: {
                         type: Object,
@@ -243,6 +255,8 @@
             }
 
             queryMovie() {
+                this.$.firstopen.style.visibility = "hidden";
+
                 //Clear existing array to populate with new movies
                 this.set('movieList', []);
                 var queryURL = "https://api.themoviedb.org/3/search/movie?api_key=621dd8327c6b6da21938d21e41f1f9da&query=" + this.$.searchBar.value;
@@ -261,15 +275,21 @@
             submitMovieReview() {
                 var currentMovieReviews = this.movieReviews[this.selectedMovie.id];
                 if (currentMovieReviews) {
-                    if(!this.user){
+                    if (!this.user) {
                         //If user not authenticated present toast message and dont let review publish
                         this.$.toast.open();
-                    }else{
+                    } else {
                         //Set movieReviews object to new object containing updated review array for current movie.
-                        this.movieReviews = {...this.movieReviews, [this.selectedMovie.id] : [...this.movieReviews[this.selectedMovie.id],
-                            {userId: this.user.uid, userName: this.user.displayName,
+                        this.movieReviews = {...this.movieReviews, [this.selectedMovie.id]
+                    :
+                        [...this.movieReviews[this.selectedMovie.id],
+                            {
+                                userId: this.user.uid, userName: this.user.displayName,
                                 rating: this.sliderValue, comment: this.$.movieComment.value
-                            }]};
+                            }
+                    ]
+                    }
+                        ;
                     }
                 }
             }
@@ -277,9 +297,9 @@
             getCurrentMovieReviews(movieReviews, currentMovie) {
                 if (currentMovie && currentMovie.id) {
                     var thisMovieReviews = movieReviews[currentMovie.id];
-                    if(!thisMovieReviews){
+                    if (!thisMovieReviews) {
                         //Initialize this movie's review array to new array
-                        this.set(`movieReviews.${currentMovie.id}`,[]);
+                        this.set(`movieReviews.${currentMovie.id}`, []);
                     }
                     //Link this property to corresponding array in movieReviews object
                     this.linkPaths('currentMovieReviews', `movieReviews.${currentMovie.id}`);
